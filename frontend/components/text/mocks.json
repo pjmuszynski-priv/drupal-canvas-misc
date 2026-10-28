@@ -1,51 +1,15 @@
 {
   "mocks": [
     {
-      "name": "Extra small",
+      "name": "Paragraph",
       "props": {
-        "text": "Enter some text...",
-        "textSize": "extra_small",
-        "textColor": "dark"
+        "text": "<p>Enter some <strong>rich</strong> text...</p>"
       }
     },
     {
-      "name": "Small",
+      "name": "Rich text",
       "props": {
-        "text": "Enter some text...",
-        "textSize": "small",
-        "textColor": "dark"
-      }
-    },
-    {
-      "name": "Large",
-      "props": {
-        "text": "Enter some text...",
-        "textSize": "large",
-        "textColor": "dark"
-      }
-    },
-    {
-      "name": "Extra large",
-      "props": {
-        "text": "Enter some text...",
-        "textSize": "extra_large",
-        "textColor": "dark"
-      }
-    },
-    {
-      "name": "Light on dark",
-      "props": {
-        "text": "Enter some text...",
-        "textSize": "normal",
-        "textColor": "light"
-      }
-    },
-    {
-      "name": "With HTML",
-      "props": {
-        "text": "<p>This is a <strong>bold</strong> and <em>italic</em> text with a <a href='#'>link</a>.</p>",
-        "textSize": "normal",
-        "textColor": "dark"
+        "text": "<h2>Rich text heading</h2><p>This paragraph includes <strong>bold</strong>, <em>italic</em>, and <a href=\"#\">linked</a> text.</p><ul><li>First item</li><li>Second item</li></ul>"
       }
     }
   ]

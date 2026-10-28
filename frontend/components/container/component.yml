@@ -1,0 +1,28 @@
+name: Container
+machineName: container
+status: true
+props:
+  properties:
+    columns:
+      title: Columns
+      type: integer
+      default: 1
+      examples:
+        - 1
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 6
+        - 12
+      meta:enum:
+        '1': '1'
+        '2': '2'
+        '3': '3'
+        '4': '4'
+        '6': '6'
+        '12': '12'
+slots:
+  content:
+    title: Content

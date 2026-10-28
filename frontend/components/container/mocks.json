@@ -1,0 +1,56 @@
+{
+  "mocks": [
+    {
+      "name": "One column",
+      "props": {
+        "columns": 1
+      },
+      "slots": {
+        "content": ["container-text"]
+      },
+      "elements": {
+        "container-text": {
+          "type": "text",
+          "props": {
+            "text": "<p>Container content.</p>"
+          }
+        }
+      }
+    },
+    {
+      "name": "Four columns",
+      "props": {
+        "columns": 4
+      },
+      "slots": {
+        "content": ["container-card-1", "container-card-2", "container-card-3", "container-card-4"]
+      },
+      "elements": {
+        "container-card-1": {
+          "type": "text",
+          "props": {
+            "text": "<p>Column 1</p>"
+          }
+        },
+        "container-card-2": {
+          "type": "text",
+          "props": {
+            "text": "<p>Column 2</p>"
+          }
+        },
+        "container-card-3": {
+          "type": "text",
+          "props": {
+            "text": "<p>Column 3</p>"
+          }
+        },
+        "container-card-4": {
+          "type": "text",
+          "props": {
+            "text": "<p>Column 4</p>"
+          }
+        }
+      }
+    }
+  ]
+}
