@@ -15,4 +15,18 @@ props:
           width: 800
           height: 600
       $ref: json-schema-definitions://canvas.module/image
+    aiDisclosure:
+      title: AI disclosure
+      type: string
+      default: none
+      examples:
+        - none
+      enum:
+        - none
+        - ai_generated
+        - ai_assisted
+      meta:enum:
+        none: No AI disclosure
+        ai_generated: AI generated
+        ai_assisted: AI assisted
 slots: []
