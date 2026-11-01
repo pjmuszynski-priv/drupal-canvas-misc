@@ -3,10 +3,12 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.image.field_ai_disclosure
     - field.field.media.image.field_media_image
     - image.style.large
     - media.type.image
   module:
+    - ai_disclosure
     - image
 _core:
   default_config_hash: 73xaTNkI5J6sfFcBmNYeuk070X3mQS_iwwWaPYyfG2M
@@ -15,6 +17,21 @@ targetEntityType: media
 bundle: image
 mode: default
 content:
+  field_ai_disclosure:
+    type: ai_disclosure_default
+    label: hidden
+    settings:
+      visibility: site_policy
+      icon_variant: site
+      details_open: false
+      style: card
+      embedded: mark_only
+      embedded_names: false
+      embedded_links: true
+      embedded_chips: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
   field_media_image:
     type: image
     label: visually_hidden

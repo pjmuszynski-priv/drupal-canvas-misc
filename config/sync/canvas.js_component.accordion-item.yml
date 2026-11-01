@@ -1,0 +1,44 @@
+uuid: e02f3241-e9de-4902-a4e3-923d2207e3c7
+langcode: en
+status: true
+dependencies: {  }
+machineName: accordion-item
+name: 'Accordion Item'
+type: external
+required:
+  - title
+props:
+  title:
+    type: string
+    title: Title
+    examples:
+      - 'Accordion item title'
+  headingElement:
+    type: string
+    enum:
+      - h2
+      - h3
+      - h4
+      - h5
+      - h6
+    'meta:enum':
+      h2: h2
+      h3: h3
+      h4: h4
+      h5: h5
+      h6: h6
+    title: 'Heading Element'
+    examples:
+      - h3
+  defaultOpen:
+    type: boolean
+    title: 'Default Open'
+    examples:
+      - false
+  anchorId:
+    type: string
+    title: 'Anchor ID'
+slots:
+  content:
+    title: Content
+dataDependencies: {  }

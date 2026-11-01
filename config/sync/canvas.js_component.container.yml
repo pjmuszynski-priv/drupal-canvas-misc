@@ -1,0 +1,32 @@
+uuid: 5ee78d97-8596-401e-92e3-5e246f3c446c
+langcode: en
+status: true
+dependencies: {  }
+machineName: container
+name: Container
+type: external
+required: {  }
+props:
+  columns:
+    type: integer
+    enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 6
+      - 12
+    'meta:enum':
+      1: '1'
+      2: '2'
+      3: '3'
+      4: '4'
+      6: '6'
+      12: '12'
+    title: Columns
+    examples:
+      - 1
+slots:
+  content:
+    title: Content
+dataDependencies: {  }

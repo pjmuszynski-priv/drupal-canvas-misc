@@ -1,0 +1,43 @@
+uuid: 8fe4e097-debb-40cf-b58d-10bcbb904da8
+langcode: en
+status: true
+dependencies: {  }
+machineName: a
+name: A
+type: external
+required: {  }
+props:
+  borderColor:
+    type: string
+    enum:
+      - gray_200
+      - gray_300
+      - gray_400
+      - primary_200
+      - primary_300
+    'meta:enum':
+      gray_200: 'Gray 200'
+      gray_300: 'Gray 300'
+      gray_400: 'Gray 400'
+      primary_200: 'Primary 200'
+      primary_300: 'Primary 300'
+    title: 'Border Color'
+    examples:
+      - gray_200
+  variant:
+    type: string
+    enum:
+      - default
+      - bordered
+      - separated
+    'meta:enum':
+      default: Default
+      bordered: Bordered
+      separated: Separated
+    title: Variant
+    examples:
+      - default
+slots:
+  items:
+    title: Items
+dataDependencies: {  }

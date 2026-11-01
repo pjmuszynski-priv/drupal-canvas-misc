@@ -1,0 +1,22 @@
+uuid: fa082359-2d1b-4beb-be48-5a46e688586d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_ai_disclosure
+    - media.type.image
+  module:
+    - ai_disclosure
+id: media.image.field_ai_disclosure
+field_name: field_ai_disclosure
+entity_type: media
+bundle: image
+label: 'AI disclosure'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  default_profile: ''
+field_type: ai_disclosure

@@ -3,10 +3,12 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.image.field_ai_disclosure
     - field.field.media.image.field_media_image
     - image.style.thumbnail
     - media.type.image
   module:
+    - ai_disclosure
     - image
     - path
 _core:
@@ -19,6 +21,12 @@ content:
   created:
     type: datetime_timestamp
     weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_ai_disclosure:
+    type: ai_disclosure_default
+    weight: 101
     region: content
     settings: {  }
     third_party_settings: {  }

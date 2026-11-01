@@ -10,11 +10,13 @@
 /frontend/.next/
 /frontend/out/
 /frontend/build/
+/frontend/dist/
 /frontend/.canvas/
 /frontend/coverage/
 /frontend/*.tsbuildinfo
 
 # Drupal runtime files.
+/private/
 /web/sites/*/files/
 /web/sites/*/private/
 /web/sites/*/settings.local.php
@@ -36,3 +38,4 @@ pnpm-debug.log*
 .DS_Store
 .idea/
 .fleet/
+.ddev/*

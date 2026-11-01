@@ -1,5 +1,8 @@
 {
+  "scripts": {
+    "canvas:push": "ddev exec 'cd frontend && npx canvas push -y'"
+  },
   "dependencies": {
-    "@drupal-canvas/cli": "^0.24.0"
+    "@drupal-canvas/cli": "0.23.1"
   }
 }

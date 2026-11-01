@@ -1,0 +1,34 @@
+uuid: 5f564a13-458d-4c1f-9823-214f95101f16
+langcode: en
+status: true
+dependencies:
+  config:
+    - canvas.js_component.container
+  module:
+    - options
+active_version: c9b8703a0bf100a5
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        columns:
+          required: false
+          field_type: list_integer
+          field_storage_settings:
+            allowed_values_function: canvas_load_allowed_values_for_component_prop
+          field_instance_settings: {  }
+          field_widget: options_select
+          default_value:
+            -
+              value: 1
+          expression: ℹ︎list_integer␟value
+          derived_schema_metadata: {  }
+    fallback_metadata:
+      slot_definitions:
+        content:
+          title: Content
+label: Container
+id: js.container
+provider: null
+source: js
+source_local_id: container

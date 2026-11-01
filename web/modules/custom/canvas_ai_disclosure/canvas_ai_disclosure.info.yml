@@ -1,0 +1,9 @@
+name: Canvas AI Disclosure
+type: module
+description: Passes the selected Media entity's effective AI disclosure to Canvas image props.
+core_version_requirement: ^11
+package: Custom
+dependencies:
+  - canvas:canvas
+  - ai_disclosure:ai_disclosure
+  - drupal:media

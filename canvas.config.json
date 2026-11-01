@@ -1,3 +1,11 @@
 {
-  "componentDir": "src/components"
+  "componentDir": "frontend/components",
+  "aliasBaseDir": "frontend",
+  "globalCssPath": "frontend/app/globals.css",
+  "outputDir": "frontend/dist",
+  "sync": {
+    "pages": false,
+    "contentTemplates": false,
+    "regions": false
+  }
 }

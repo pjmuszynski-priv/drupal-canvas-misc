@@ -1,0 +1,18 @@
+uuid: 11d806d9-da06-447e-9de5-000bf5fadf71
+langcode: en
+status: true
+dependencies: {  }
+machineName: text
+name: Text
+type: external
+required: {  }
+props:
+  text:
+    type: string
+    contentMediaType: text/html
+    x-formatting-context: block
+    title: Text
+    examples:
+      - '<p>Enter some text...</p>'
+slots: {  }
+dataDependencies: {  }

@@ -1,0 +1,19 @@
+uuid: 530ab825-c52a-4d21-a403-4588392def09
+langcode: en
+status: true
+dependencies:
+  module:
+    - ai_disclosure
+    - media
+id: media.field_ai_disclosure
+field_name: field_ai_disclosure
+entity_type: media
+type: ai_disclosure
+settings: {  }
+module: ai_disclosure
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

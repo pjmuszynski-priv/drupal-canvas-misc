@@ -1,0 +1,21 @@
+uuid: 593043b4-ecda-4508-8cd0-c56c3105101e
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: qT9ftTtwA-_tqnvb2cbxxNqLqVzefMYTinsz5PNSZB0
+id: human_only
+label: 'Human only'
+description: 'No AI involvement.'
+severity: 0
+eu_icon: none
+label_required: false
+disclosure_sentence: 'Written without AI.'
+iptc_digital_source_type: null
+visible_parts:
+  icon: false
+  sentence: false
+  legal: false
+  description: false
+  statement: false
+  editorial_responsibility: false

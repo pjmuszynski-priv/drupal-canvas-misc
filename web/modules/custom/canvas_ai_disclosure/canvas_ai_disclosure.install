@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Installation for the Canvas/Media disclosure bridge.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function canvas_ai_disclosure_install(): void {
+  \Drupal\canvas_ai_disclosure\MappingUpdater::updateExistingComponents();
+}
