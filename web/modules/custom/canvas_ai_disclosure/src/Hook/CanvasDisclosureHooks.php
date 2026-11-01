@@ -16,6 +16,18 @@ use Drupal\Core\Hook\Order\OrderAfter;
  */
 final class CanvasDisclosureHooks {
 
+  #[Hook('library_info_alter')]
+  public static function libraryInfoAlter(array &$libraries, string $extension): void {
+    if ($extension === 'gin' && isset($libraries['media_library'])) {
+      $path = '/' . \Drupal::service('extension.list.module')->getPath('canvas_ai_disclosure');
+      $libraries['media_library']['css']['theme'][$path . '/css/gin-media-library.css'] = ['weight' => 100];
+    }
+    if ($extension === 'canvas' && isset($libraries['canvas-ui'])) {
+      $path = '/' . \Drupal::service('extension.list.module')->getPath('canvas_ai_disclosure');
+      $libraries['canvas-ui']['css']['theme'][$path . '/css/canvas-media-library.css'] = ['weight' => 100];
+    }
+  }
+
   #[Hook('field_info_alter', order: new OrderAfter(['canvas']))]
   public static function fieldInfoAlter(array &$info): void {
     $info['image']['class'] = DisclosureImageItem::class;

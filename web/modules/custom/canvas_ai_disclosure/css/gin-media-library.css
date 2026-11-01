@@ -1,0 +1,66 @@
+/* Gin absolutely positions thumbnails. Give the disclosure wrappers the same
+ * preview area so their absolutely positioned images cannot collapse them. */
+.media-library-item .media-library-item__preview .ai-disclosure-media-overlay {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.media-library-item .media-library-item__preview .ai-disclosure-media-overlay__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Gin's generic image rule also targets the disclosure icon. Keep the icon's
+ * own width and margin, but restore its height, background and corner. */
+.media-library-item .media-library-item__preview .field img.ai-disclosure-media-overlay__icon {
+  height: auto;
+  background: none;
+  object-fit: contain;
+}
+
+.media-library-item .media-library-item__preview .field img.ai-disclosure-media-overlay__icon--pill {
+  width: var(--ai-disclosure-media-overlay-pill-width, max(64px, 22%));
+}
+
+.media-library-item .media-library-item__preview .field img.ai-disclosure-media-overlay__icon--square {
+  width: var(--ai-disclosure-media-overlay-square-width, max(32px, 9%));
+}
+
+.media-library-item .media-library-item__preview .ai-disclosure-media-overlay--top-right .ai-disclosure-media-overlay__icon {
+  inset: 0 0 auto auto;
+}
+
+.media-library-item .media-library-item__preview .ai-disclosure-media-overlay--top-left .ai-disclosure-media-overlay__icon {
+  inset: 0 auto auto 0;
+}
+
+.media-library-item .media-library-item__preview .ai-disclosure-media-overlay--bottom-right .ai-disclosure-media-overlay__icon {
+  inset: auto 0 0 auto;
+}
+
+.media-library-item .media-library-item__preview .ai-disclosure-media-overlay--bottom-left .ai-disclosure-media-overlay__icon {
+  inset: auto auto 0 0;
+}
+
+/* An adjacent label reserves its own strip below the thumbnail. */
+.media-library-item .media-library-item__preview .ai-disclosure-media-overlay--adjacent {
+  display: flex;
+  flex-direction: column;
+}
+
+.media-library-item .media-library-item__preview .ai-disclosure-media-overlay--adjacent > .ai-disclosure-media-overlay__frame {
+  flex: 1;
+  min-height: 0;
+}
+
+.media-library-item .media-library-item__preview .ai-disclosure-media-overlay--adjacent > img.ai-disclosure-media-overlay__icon {
+  position: static;
+  flex: none;
+  align-self: flex-start;
+  width: auto;
+  height: var(--ai-disclosure-media-overlay-adjacent-height, 2em);
+}

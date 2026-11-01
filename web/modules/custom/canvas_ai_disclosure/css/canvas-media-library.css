@@ -1,0 +1,45 @@
+/* Canvas sizes every image in the selection, including the AI icon, as a
+ * thumbnail. Keep the picture square and the icon at its natural aspect ratio. */
+.canvas-app [data-canvas-media-library-selection] [data-media-library-item-delta] .ai-disclosure-media-overlay {
+  display: block;
+  width: var(--canvas-media-item-width, 72px);
+  height: var(--canvas-media-item-height, 72px);
+}
+
+.canvas-app [data-canvas-media-library-selection] [data-media-library-item-delta] .ai-disclosure-media-overlay__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-app [data-canvas-media-library-selection] [data-media-library-item-delta] .ai-disclosure-media-overlay img.ai-disclosure-media-overlay__icon {
+  height: auto;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.canvas-app [data-canvas-media-library-selection] [data-media-library-item-delta] .ai-disclosure-media-overlay img.ai-disclosure-media-overlay__icon--pill {
+  width: min(64px, calc(100% - 4px));
+}
+
+.canvas-app [data-canvas-media-library-selection] [data-media-library-item-delta] .ai-disclosure-media-overlay img.ai-disclosure-media-overlay__icon--square {
+  width: min(32px, calc(100% - 4px));
+}
+
+/* Preserve the module's adjacent-label mode inside the same thumbnail slot. */
+.canvas-app [data-canvas-media-library-selection] [data-media-library-item-delta] .ai-disclosure-media-overlay--adjacent {
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-app [data-canvas-media-library-selection] [data-media-library-item-delta] .ai-disclosure-media-overlay--adjacent > .ai-disclosure-media-overlay__frame {
+  flex: 1;
+  min-height: 0;
+}
+
+.canvas-app [data-canvas-media-library-selection] [data-media-library-item-delta] .ai-disclosure-media-overlay--adjacent .ai-disclosure-media-overlay__frame > img:not(.ai-disclosure-media-overlay__icon) {
+  height: 100%;
+}
