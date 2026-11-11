@@ -24,4 +24,5 @@ frontends:
       - js.text
       - js.two_column_text
       - js.video
+      - js.template_shell
 assertion_expiration: 60

@@ -1,0 +1,57 @@
+uuid: 98181c1b-4c5f-435f-9fc3-8a7f6cdff778
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.slot_demo.canvas_slot_additional
+    - field.field.node.slot_demo.canvas_slot_main
+    - node.type.slot_demo
+  module:
+    - path
+id: node.slot_demo.default
+targetEntityType: node
+bundle: slot_demo
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 120
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 5
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  canvas_slot_additional: true
+  canvas_slot_main: true
+  promote: true
+  sticky: true

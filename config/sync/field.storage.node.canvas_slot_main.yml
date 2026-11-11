@@ -1,0 +1,19 @@
+uuid: 308f2be8-c9ad-49fa-9d98-7045b996865e
+langcode: en
+status: true
+dependencies:
+  module:
+    - canvas
+    - node
+id: node.canvas_slot_main
+field_name: canvas_slot_main
+entity_type: node
+type: component_tree
+settings: {  }
+module: canvas
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

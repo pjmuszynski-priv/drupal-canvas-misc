@@ -1,0 +1,24 @@
+uuid: 06f0efe7-b04c-4fa1-9250-6f4f3d991be7
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.slot_demo.canvas_slot_additional
+    - field.field.node.slot_demo.canvas_slot_main
+    - node.type.slot_demo
+  module:
+    - user
+id: node.slot_demo.full
+targetEntityType: node
+bundle: slot_demo
+mode: full
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  canvas_slot_additional: true
+  canvas_slot_main: true

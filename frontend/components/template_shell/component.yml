@@ -1,0 +1,15 @@
+name: Editorial template
+machineName: template_shell
+status: true
+props:
+  properties:
+    title:
+      title: Title
+      type: string
+      examples:
+        - A shared layout. Your own story.
+slots:
+  main:
+    title: Main content
+  supplementary:
+    title: Additional content

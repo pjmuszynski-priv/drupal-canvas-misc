@@ -1,0 +1,30 @@
+uuid: 9d78c36e-2a8e-45fe-a65a-89529ab66311
+langcode: en
+status: true
+dependencies:
+  config:
+    - filter.format.canvas_html_block
+    - node.type.slot_demo
+  module:
+    - canvas
+    - canvas_headless
+    - filter
+    - node
+    - path
+    - system
+id: slot_demo_editor
+label: 'Slot demo: moderator'
+weight: 4
+is_admin: false
+permissions:
+  - 'access administration pages'
+  - 'access canvas headless preview'
+  - 'access content'
+  - 'access content overview'
+  - 'create slot_demo content'
+  - 'create url aliases'
+  - 'edit any slot_demo content'
+  - 'publish auto-saves'
+  - 'use text format canvas_html_block'
+  - 'view own unpublished content'
+  - 'view the administration theme'

@@ -1,0 +1,21 @@
+uuid: d7f403a7-b343-4554-8f47-3e850da9b7ae
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.canvas_slot_main
+    - node.type.slot_demo
+  module:
+    - canvas
+id: node.slot_demo.canvas_slot_main
+field_name: canvas_slot_main
+entity_type: node
+bundle: slot_demo
+label: 'Main content'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: component_tree

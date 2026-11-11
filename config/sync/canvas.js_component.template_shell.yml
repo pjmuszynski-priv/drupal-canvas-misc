@@ -1,0 +1,20 @@
+uuid: 92bec0cb-4069-4b9f-b71a-2fd73126450b
+langcode: en
+status: true
+dependencies: {  }
+machineName: template_shell
+name: 'Editorial template'
+type: external
+required: {  }
+props:
+  title:
+    type: string
+    title: Title
+    examples:
+      - 'A shared layout. Your own story.'
+slots:
+  main:
+    title: 'Main content'
+  supplementary:
+    title: 'Additional content'
+dataDependencies: {  }

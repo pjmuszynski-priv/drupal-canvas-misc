@@ -10,6 +10,30 @@
     },
     "repositories": [
         {
+            "type": "package",
+            "package": {
+                "name": "drupal/canvas",
+                "version": "dev-exposed-slots",
+                "type": "drupal-module",
+                "license": "GPL-2.0-or-later",
+                "description": "Canvas exposed slots prototype — MR !1359, pinned commit",
+                "require": {
+                    "drupal/core": "^11.3",
+                    "justinrainbow/json-schema": "^6.8.0"
+                },
+                "dist": {
+                    "type": "zip",
+                    "url": "https://git.drupalcode.org/api/v4/projects/235995/repository/archive.zip?sha=0d25ce99b2fc4e3d94a722013bb867183e046e5e",
+                    "reference": "0d25ce99b2fc4e3d94a722013bb867183e046e5e"
+                },
+                "source": {
+                    "type": "git",
+                    "url": "https://git.drupalcode.org/issue/canvas-3591817.git",
+                    "reference": "0d25ce99b2fc4e3d94a722013bb867183e046e5e"
+                }
+            }
+        },
+        {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
         }
@@ -17,7 +41,7 @@
     "require": {
         "composer/installers": "^2.3",
         "drupal/ai_disclosure": "^1.0@beta",
-        "drupal/canvas": "^1.11",
+        "drupal/canvas": "dev-exposed-slots as 1.12.0",
         "drupal/coffee": "^2.0",
         "drupal/core-composer-scaffold": "^11.4",
         "drupal/core-project-message": "^11.4",

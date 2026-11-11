@@ -1,0 +1,35 @@
+uuid: e8855604-fdd5-4321-88c5-f972c244b843
+langcode: en
+status: true
+dependencies:
+  config:
+    - canvas.component.js.template_shell
+    - core.entity_view_mode.node.full
+    - field.field.node.slot_demo.canvas_slot_additional
+    - field.field.node.slot_demo.canvas_slot_main
+    - node.type.slot_demo
+  module:
+    - node
+id: node.slot_demo.full
+content_entity_type_id: node
+content_entity_type_bundle: slot_demo
+content_entity_type_view_mode: full
+component_tree:
+  6750b4b3-b6f3-43ee-a9f0-c39890a34401:
+    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34401
+    component_id: js.template_shell
+    component_version: 547e25b0596714da
+    inputs:
+      title:
+        sourceType: entity-field
+        expression: 'ℹ︎␜entity:node:slot_demo␝title␞␟value'
+exposed_slots:
+  canvas_slot_additional:
+    component_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34401
+    slot_name: supplementary
+    label: 'Additional content'
+  canvas_slot_main:
+    component_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34401
+    slot_name: main
+    label: 'Main content'
+page_variant: null

@@ -1,0 +1,34 @@
+uuid: 2e4febcf-7e89-41d7-b128-1572f01a90ad
+langcode: en
+status: true
+dependencies:
+  config:
+    - canvas.js_component.template_shell
+active_version: 547e25b0596714da
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        title:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'A shared layout. Your own story.'
+          expression: ℹ︎string␟value
+          derived_schema_metadata:
+            string_shape: {  }
+    fallback_metadata:
+      slot_definitions:
+        main:
+          title: 'Main content'
+        supplementary:
+          title: 'Additional content'
+label: 'Editorial template'
+id: js.template_shell
+provider: null
+source: js
+source_local_id: template_shell

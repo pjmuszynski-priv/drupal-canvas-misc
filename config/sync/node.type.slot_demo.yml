@@ -1,0 +1,11 @@
+uuid: d1dc8cc2-464f-4302-9b64-ae6e03fc3772
+langcode: en
+status: true
+dependencies: {  }
+name: 'Two-slot editorial page'
+type: slot_demo
+description: 'A shared Canvas content template with two independent exposed slots.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true

@@ -1,0 +1,21 @@
+uuid: 36cac704-3614-41e0-b780-aa922809239b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.canvas_slot_additional
+    - node.type.slot_demo
+  module:
+    - canvas
+id: node.slot_demo.canvas_slot_additional
+field_name: canvas_slot_additional
+entity_type: node
+bundle: slot_demo
+label: 'Additional content'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: component_tree
