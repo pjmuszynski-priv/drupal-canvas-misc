@@ -49,8 +49,11 @@ try {
   $region_ids = array_column($layout['layout'], 'id');
   sort($region_ids);
   $check($region_ids === ['canvas_slot_additional', 'canvas_slot_main'], 'API exposes exactly two editable slot regions');
-  $host = '6750b4b3-b6f3-43ee-a9f0-c39890a34401';
-  $check(!isset($layout['model'][$host]), 'Template shell is absent from the editable model');
+  $template = ContentTemplate::load('node.slot_demo.full');
+  $exposed_slots = $template->getExposedSlots();
+  foreach ($template->getComponentTree()->getValue() as $row) {
+    $check(!isset($layout['model'][$row['uuid']]), 'Shared template component is absent from the editable model');
+  }
   $template_response = $client->get('/canvas/api/v0/layout-content-template/node.slot_demo.full/' . $node->id(), ['headers' => $headers]);
   $check($template_response->getStatusCode() === 403, 'Moderator cannot edit the shared content template');
   $post_body = static function (array $layout): array {
@@ -87,7 +90,9 @@ try {
   $response = $client->get('https://d11-next.ddev.site:3000/api/draft', ['query' => ['assertion' => $assertion_data['assertion']]]);
   $preview_html = (string) $response->getBody();
   $check($response->getStatusCode() === 200 && str_contains($preview_html, 'Updated main slot through the API') && str_contains($preview_html, 'Updated additional slot through the API'), 'Next draft preview renders unsaved changes in both slots');
-  $check(str_contains($preview_html, $host . '/main') && str_contains($preview_html, $host . '/supplementary'), 'Next preview supplies editor markers for both exposed slots');
+  foreach ($exposed_slots as $slot) {
+    $check(str_contains($preview_html, $slot['component_uuid'] . '/' . $slot['slot_name']), 'Next preview supplies the exposed slot editor marker');
+  }
   $pending_response = $client->get('/canvas/api/v0/auto-saves/pending', ['headers' => $headers]);
   $pending = json_decode((string) $pending_response->getBody(), TRUE, flags: JSON_THROW_ON_ERROR);
   $check(ContentTemplate::load('node.slot_demo.full')->toArray() === $before_template, 'Editing slots leaves the shared template unchanged');
@@ -119,7 +124,8 @@ try {
   $template = ContentTemplate::load('node.slot_demo.full');
   $restore_template_tree = $template->get('component_tree');
   $changed_tree = $restore_template_tree;
-  $changed_tree[$host]['inputs']['title'] = 'Shared template propagation check';
+  $title_uuid = '6750b4b3-b6f3-43ee-a9f0-c39890a34403';
+  $changed_tree[$title_uuid]['inputs']['heading'] = 'Shared template propagation check';
   $template->set('component_tree', $changed_tree)->save();
   foreach (['alpha', 'beta'] as $slug) {
     $response = $client->get('https://d11-next.ddev.site:3000/slot-demo/' . $slug);

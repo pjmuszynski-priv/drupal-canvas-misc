@@ -3,33 +3,107 @@ langcode: en
 status: true
 dependencies:
   config:
-    - canvas.component.js.template_shell
+    - canvas.component.js.container
+    - canvas.component.js.grid_container
+    - canvas.component.js.heading
+    - canvas.component.js.section
+    - canvas.component.js.text
     - core.entity_view_mode.node.full
     - field.field.node.slot_demo.canvas_slot_additional
     - field.field.node.slot_demo.canvas_slot_main
+    - filter.format.canvas_html_block
     - node.type.slot_demo
   module:
     - node
+    - options
+    - text
 id: node.slot_demo.full
 content_entity_type_id: node
 content_entity_type_bundle: slot_demo
 content_entity_type_view_mode: full
 component_tree:
-  6750b4b3-b6f3-43ee-a9f0-c39890a34401:
-    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34401
-    component_id: js.template_shell
-    component_version: 547e25b0596714da
+  6750b4b3-b6f3-43ee-a9f0-c39890a34404:
+    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
+    component_id: js.section
+    component_version: 27b0cb8d893d96c8
     inputs:
-      title:
+      width: wide
+  6750b4b3-b6f3-43ee-a9f0-c39890a34407:
+    parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
+    slot: content
+    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34407
+    component_id: js.text
+    component_version: 39a4d4ce44c087d9
+    inputs:
+      text:
+        value: '<p><strong>Canvas template demo</strong> · <a href="/slot-demo/alpha">Alpha</a> · <a href="/slot-demo/beta">Beta</a></p>'
+        format: canvas_html_block
+  6750b4b3-b6f3-43ee-a9f0-c39890a34403:
+    parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
+    slot: content
+    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34403
+    component_id: js.heading
+    component_version: 0e90b47cc96494b2
+    inputs:
+      heading:
         sourceType: entity-field
         expression: 'ℹ︎␜entity:node:slot_demo␝title␞␟value'
+      textColor: dark
+      headingElement: h1
+      headingSize: large
+      layout: left_aligned
+  6750b4b3-b6f3-43ee-a9f0-c39890a34408:
+    parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
+    slot: content
+    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34408
+    component_id: js.text
+    component_version: 39a4d4ce44c087d9
+    inputs:
+      text:
+        value: '<p>This introduction is shared by every page using this Canvas template.</p>'
+        format: canvas_html_block
+  6750b4b3-b6f3-43ee-a9f0-c39890a34405:
+    parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
+    slot: content
+    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34405
+    component_id: js.grid_container
+    component_version: bcf7874f44734a6e
+    inputs:
+      layout: 67-33
+      gap: large
+  6750b4b3-b6f3-43ee-a9f0-c39890a34401:
+    parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34405
+    slot: content
+    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34401
+    component_id: js.container
+    component_version: c9b8703a0bf100a5
+    inputs:
+      columns: 1
+  6750b4b3-b6f3-43ee-a9f0-c39890a34402:
+    parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34405
+    slot: content
+    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34402
+    component_id: js.container
+    component_version: c9b8703a0bf100a5
+    inputs:
+      columns: 1
+  6750b4b3-b6f3-43ee-a9f0-c39890a34406:
+    parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
+    slot: content
+    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34406
+    component_id: js.text
+    component_version: 39a4d4ce44c087d9
+    inputs:
+      text:
+        value: '<p>Shared footer · edited in the Canvas content template.</p>'
+        format: canvas_html_block
 exposed_slots:
   canvas_slot_additional:
-    component_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34401
-    slot_name: supplementary
+    component_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34402
+    slot_name: content
     label: 'Additional content'
   canvas_slot_main:
     component_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34401
-    slot_name: main
+    slot_name: content
     label: 'Main content'
 page_variant: null

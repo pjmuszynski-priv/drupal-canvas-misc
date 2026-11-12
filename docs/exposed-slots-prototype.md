@@ -14,18 +14,29 @@ Content Template. It is not a standalone `canvas_page` entity.
 Node IDs above are from this database. The setup script prints the actual editor
 URLs when creating the demo on another database.
 
-The `Editorial template` React component supplies the shared header, hero,
-responsive two-column layout, and footer. Its title reads the node's title.
-Its `main` and `supplementary` slots are exposed through two separate
-`component_tree` fields:
+The shared layout is assembled in the Canvas Content Template from existing
+components. Open **Content Templates → Two-slot editorial page → Full** to
+edit its structure. Its tree contains a Section with introductory Text, a
+Heading bound to the node title, another Text, a Grid container with two
+Containers, and footer Text. Each element can be selected, configured, moved,
+or replaced in the template editor. Next renders these ordinary components.
+
+The `content` slot of each inner Container is exposed through its own
+`component_tree` field:
 
 | Slot | Node field | Editor label |
 | --- | --- | --- |
-| `main` | `canvas_slot_main` | Main content |
-| `supplementary` | `canvas_slot_additional` | Additional content |
+| Main Container → `content` | `canvas_slot_main` | Main content |
+| Additional Container → `content` | `canvas_slot_additional` | Additional content |
 
-Each node stores its own components in each field. The shared template has one
-shell component; slot editing never copies that shell into the node.
+Each node stores its own components in each field. Editing a node exposes only
+those two regions. Editing the Content Template changes the shared layout for
+both pages. To see the difference, change the introductory Text in the template,
+then change a Heading inside Alpha's Main content region. The introduction
+changes on Alpha and Beta; the slot edit belongs only to Alpha.
+
+The earlier `template_shell` component remains available as an unused prototype
+asset. The demo template no longer uses it.
 
 ## Roles
 
@@ -73,9 +84,10 @@ ddev drush php:script scripts/setup-slot-demo.php
 ddev drush cache:rebuild
 ```
 
-The setup script creates missing demo configuration and pages, grants the demo
-roles' permissions, and registers the shell with the existing Next frontend.
-Re-running it preserves existing demo slot content and template changes.
+The setup script creates missing demo configuration and pages and grants the
+demo roles' permissions. It upgrades the original single-shell template to the
+Canvas component tree while preserving both node fields. Subsequent runs
+preserve edits to the composed template and existing demo slot content.
 The committed configuration is also available for the project's normal config
 import workflow. The demo nodes themselves are seeded by the setup script,
 not stored in configuration exports.
