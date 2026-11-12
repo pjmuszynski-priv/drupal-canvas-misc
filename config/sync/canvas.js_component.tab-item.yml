@@ -1,0 +1,41 @@
+uuid: 964336c6-8fa5-4971-b638-c3e86e402e6f
+langcode: en
+status: true
+dependencies: {  }
+machineName: tab-item
+name: 'Tab Item'
+required:
+  - tabLabel
+props:
+  tabLabel:
+    type: string
+    title: 'Tab label'
+    examples:
+      - Overview
+slots:
+  body:
+    title: Body
+    description: 'Add the components to display when this tab is selected.'
+js:
+  original: |
+    'use client';
+
+    export default function TabItem({ tabLabel, body }) {
+      return (
+        <div data-tab-item={tabLabel?.trim() || 'Tab'}>
+          {body}
+        </div>
+      );
+    }
+  compiled: |
+    import { jsx } from "react/jsx-runtime";
+    function TabItem({ tabLabel, body }) {
+      return /* @__PURE__ */ jsx("div", { "data-tab-item": (tabLabel == null ? void 0 : tabLabel.trim()) || "Tab", children: body });
+    }
+    export {
+      TabItem as default
+    };
+css:
+  original: ''
+  compiled: ''
+dataDependencies: {  }

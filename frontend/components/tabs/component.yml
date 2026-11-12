@@ -1,0 +1,20 @@
+name: Tabs
+machineName: tabs
+status: true
+required: []
+props:
+  properties:
+    header:
+      type: string
+      title: Header
+      examples:
+        - Explore the options
+    subheader:
+      type: string
+      title: Subheader
+      examples:
+        - Choose a tab to see more.
+slots:
+  items:
+    title: Tabs
+    description: Add a Tab Item for each tab, in the order you want it to appear.

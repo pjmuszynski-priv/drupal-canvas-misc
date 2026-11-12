@@ -1,0 +1,16 @@
+name: Tab Item
+machineName: tab-item
+status: true
+required:
+  - tabLabel
+props:
+  properties:
+    tabLabel:
+      type: string
+      title: Tab label
+      examples:
+        - Overview
+slots:
+  body:
+    title: Body
+    description: Add the components to display when this tab is selected.
