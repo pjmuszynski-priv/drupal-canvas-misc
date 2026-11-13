@@ -1,0 +1,1009 @@
+diff --git a/config/schema/canvas.schema.yml b/config/schema/canvas.schema.yml
+--- a/config/schema/canvas.schema.yml
++++ b/config/schema/canvas.schema.yml
+@@ -533,6 +533,16 @@
+       sequence:
+         type: text
+         label: 'Example for slot'
++    expected:
++      type: sequence
++      label: 'Expected component IDs'
++      requiredKey: false
++      sequence:
++        type: string
++        constraints:
++          Regex:
++            pattern: '/^[a-z][a-z0-9_]*\.[a-zA-Z0-9_.:-]+$/'
++        label: 'Canvas component ID'
+ 
+ canvas.component_source_local_id.sdc:
+   type: canvas.component_source_local_id.*
+diff --git a/docs/slot-restrictions.md b/docs/slot-restrictions.md
+new file mode 100644
+--- /dev/null
++++ b/docs/slot-restrictions.md
+@@ -0,0 +1,17 @@
++# Slot component restrictions
++
++Slots may declare an optional `expected` array of explicit Canvas component IDs.
++A missing or empty array leaves composition unrestricted. The active component
++policy applies to older instances as well.
++
++Slot metadata is retained in versioned component definitions and in editor
++slot nodes. Exposed-slot regions carry the policy resolved from their
++template-owned parent. Editor middleware validates the entire candidate tree
++before structural mutations enter history. Library filtering follows selection;
++hovering during a drag keeps the source mounted. Drupal applies the same rule at
++validation, auto-save, and entity save boundaries. Empty exposed-slot override
++markers remain supported.
++
++See the project's `scripts/check-slot-restrictions.php` for the authenticated
++HTTP checks and `ui/src/features/layout/exposedSlots.test.jsx` for regression
++coverage of atomic insertions, moves, and exposed-region roots.
+diff --git a/openapi.yml b/openapi.yml
+--- a/openapi.yml
++++ b/openapi.yml
+@@ -4588,6 +4588,8 @@
+                   description:
+                     type: string
+                     title: Description
++                  expected:
++                    $ref: '#/components/schemas/ExpectedSlotComponents'
+                   examples:
+                     type: array
+                     items:
+@@ -4692,6 +4694,8 @@
+               description:
+                 type: string
+                 label: Description
++              expected:
++                $ref: '#/components/schemas/ExpectedSlotComponents'
+               examples:
+                 type: array
+                 items:
+@@ -4826,6 +4830,11 @@
+           description: Array of slots
+           items:
+             $ref: '#/components/schemas/LayoutSlot'
++    ExpectedSlotComponents:
++      type: array
++      description: Active slot policy as explicit Canvas component IDs. An empty array leaves the slot unrestricted.
++      items:
++        type: string
+     LayoutSlot:
+       title: LayoutSlot
+       type: object
+@@ -4847,6 +4856,8 @@
+         name:
+           type: string
+           description: The name of the slot
++        expected:
++          $ref: '#/components/schemas/ExpectedSlotComponents'
+         components:
+           type: array
+           description: Array of components
+diff --git a/src/AutoSave/AutoSaveManager.php b/src/AutoSave/AutoSaveManager.php
+--- a/src/AutoSave/AutoSaveManager.php
++++ b/src/AutoSave/AutoSaveManager.php
+@@ -203,6 +203,7 @@
+   }
+ 
+   public function saveEntity(EntityInterface $entity, ?string $clientId = NULL): void {
++    \Drupal\canvas\SlotRestrictions::validateEntity($entity, draft: TRUE);
+     $key = $this->getAutoSaveKey($entity);
+     $data = self::normalizeEntity($entity);
+     $data_hash = self::generateHash($data);
+diff --git a/src/ComponentSource/ComponentSourceBase.php b/src/ComponentSource/ComponentSourceBase.php
+--- a/src/ComponentSource/ComponentSourceBase.php
++++ b/src/ComponentSource/ComponentSourceBase.php
+@@ -115,12 +115,16 @@
+       \array_keys(\array_filter($slot_definitions, \is_array(...))),
+       static function (array $carry, string $slot_name) use ($slot_definitions): array {
+         $slot_examples = $slot_definitions[$slot_name]['examples'] ?? [];
+-        return $carry + [
+-          $slot_name => [
+-            'title' => $slot_definitions[$slot_name]['title'],
+-            'example' => $slot_examples === [] ? '' : \current($slot_examples),
+-          ],
++        $definition = [
++          'title' => $slot_definitions[$slot_name]['title'],
++          'example' => $slot_examples === [] ? '' : \current($slot_examples),
+         ];
++        $expected = $slot_definitions[$slot_name]['expected'] ?? [];
++        if ($expected !== []) {
++          sort($expected);
++          $definition['expected'] = array_values(array_unique($expected));
++        }
++        return $carry + [$slot_name => $definition];
+       },
+       []
+     );
+diff --git a/src/Controller/ApiLayoutController.php b/src/Controller/ApiLayoutController.php
+--- a/src/Controller/ApiLayoutController.php
++++ b/src/Controller/ApiLayoutController.php
+@@ -1121,7 +1121,7 @@
+       if (!$slot_field->access('view') || !$slot_field->access('edit')) {
+         continue;
+       }
+-      $layout[] = $this->buildRegion(
++      $region = $this->buildRegion(
+         $field_name,
+         $slot_field,
+         $model,
+@@ -1129,6 +1129,8 @@
+         client_id: $field_name,
+         name: $definition['label'],
+       );
++      $region['expected'] = \Drupal\canvas\SlotRestrictions::forExposedSlot($template, $field_name);
++      $layout[] = $region;
+     }
+     return $layout;
+   }
+diff --git a/src/Entity/Component.php b/src/Entity/Component.php
+--- a/src/Entity/Component.php
++++ b/src/Entity/Component.php
+@@ -733,7 +733,7 @@
+    *
+    * @param array $definition
+    *
+-   * @return array{title: string, description?: string, examples: string[]}
++   * @return array{title: string, description?: string, examples: string[], expected?: string[]}
+    *   Clean definitions.
+    */
+   private static function cleanSlotDefinition(array $definition): array {
+@@ -741,11 +741,12 @@
+     // that aren't specified in the SDC metadata schema and in our config
+     // schema.
+     // @todo Remove when core enforces this - https://www.drupal.org/i/3522623
+-    /** @var array{title: string, description?: string, examples: string[]} */
++    /** @var array{title: string, description?: string, examples: string[], expected?: string[]} */
+     return \array_intersect_key($definition, array_flip([
+       'title',
+       'description',
+       'examples',
++      'expected',
+     ]));
+   }
+ 
+diff --git a/src/Hook/SlotRestrictionHooks.php b/src/Hook/SlotRestrictionHooks.php
+new file mode 100644
+--- /dev/null
++++ b/src/Hook/SlotRestrictionHooks.php
+@@ -0,0 +1,24 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\canvas\Hook;
++
++use Drupal\canvas\SlotRestrictions;
++use Drupal\Core\Entity\EntityInterface;
++use Drupal\Core\Hook\Attribute\Hook;
++
++/**
++ * Enforces slot restrictions for saves outside the editor as well.
++ */
++final class SlotRestrictionHooks {
++
++  /**
++   * Implements hook_entity_presave().
++   */
++  #[Hook('entity_presave')]
++  public function entityPresave(EntityInterface $entity): void {
++    SlotRestrictions::validateEntity($entity);
++  }
++
++}
+diff --git a/src/Plugin/Field/FieldType/ComponentTreeItemList.php b/src/Plugin/Field/FieldType/ComponentTreeItemList.php
+--- a/src/Plugin/Field/FieldType/ComponentTreeItemList.php
++++ b/src/Plugin/Field/FieldType/ComponentTreeItemList.php
+@@ -161,6 +161,7 @@
+           'id' => $component_instance_uuid . '/' . $slot_name,
+           'name' => $slot_name,
+           'nodeType' => 'slot',
++          'expected' => \Drupal\canvas\SlotRestrictions::expected($item->getValue(), $slot_name),
+         ];
+         $child_build = self::buildLayoutAndModel($this->componentTreeItemsIterator(self::isChildOfComponentTreeItemSlot($component_instance_uuid, (string) $slot_name)), $host_entity);
+         $built['model'] += $child_build['model'];
+diff --git a/src/Plugin/Validation/Constraint/ComponentTreeStructureConstraintValidator.php b/src/Plugin/Validation/Constraint/ComponentTreeStructureConstraintValidator.php
+--- a/src/Plugin/Validation/Constraint/ComponentTreeStructureConstraintValidator.php
++++ b/src/Plugin/Validation/Constraint/ComponentTreeStructureConstraintValidator.php
+@@ -56,6 +56,10 @@
+   public function validate(mixed $value, Constraint $constraint): void {
+     if ($value === NULL) {
+       return;
++    }
++    $root_expected = [];
++    if ($value instanceof ComponentTreeItemList && ($host = $value->getParent()?->getValue()) instanceof FieldableEntityInterface) {
++      $root_expected = \Drupal\canvas\SlotRestrictions::forField($host, $value->getName());
+     }
+     if ($value instanceof ComponentTreeItemList) {
+       $value = $value->getValue();
+@@ -184,6 +188,13 @@
+         $violation->getCause(),
+       ));
+     }
++    foreach (\Drupal\canvas\SlotRestrictions::violations($value, $root_expected) as $delta => $message) {
++      $path = self::translatePropertyPath($base_property_path, "[$delta][component_id]", $this->context->getPropertyPath());
++      $this->context->getViolations()->add(new ConstraintViolation(
++        $message, $message, [], $this->context->getRoot(), $path, $value[$delta]['component_id'],
++      ));
++    }
++
+   }
+ 
+   private static function translatePropertyPath(string $base_path, string $property_path, string $context_path = ''): string {
+diff --git a/src/SlotRestrictions.php b/src/SlotRestrictions.php
+new file mode 100644
+--- /dev/null
++++ b/src/SlotRestrictions.php
+@@ -0,0 +1,123 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\canvas;
++
++use Drupal\canvas\AutoSave\AutoSaveManager;
++use Drupal\canvas\Entity\Component;
++use Drupal\canvas\Entity\ComponentTreeEntityInterface;
++use Drupal\canvas\Entity\ContentTemplate;
++use Drupal\canvas\Exception\ConstraintViolationException;
++use Drupal\canvas\Plugin\Canvas\ComponentSource\Marker;
++use Drupal\Core\Entity\EntityInterface;
++use Drupal\Core\Entity\FieldableEntityInterface;
++use Symfony\Component\Validator\ConstraintViolation;
++use Symfony\Component\Validator\ConstraintViolationList;
++
++/**
++ * Enforces explicit component IDs declared in slot metadata.
++ *
++ * @internal
++ */
++final class SlotRestrictions {
++
++  /**
++   * Gets the active slot policy, including for older component instances.
++   */
++  public static function expected(array $row, string $slot): array {
++    $component = Component::load($row['component_id'] ?? '');
++    if (!$component) {
++      return [];
++    }
++    return $component->getSlotDefinitions($component->getActiveVersion())[$slot]['expected'] ?? [];
++  }
++
++  /**
++   * Resolves the template-owned parent of an exposed slot field.
++   */
++  public static function forField(FieldableEntityInterface $entity, string $field, bool $draft = FALSE): array {
++    $template = ContentTemplate::loadForEntity($entity, 'full');
++    if (!$template || !$template->status()) {
++      return [];
++    }
++    if ($draft) {
++      $pending = \Drupal::service(AutoSaveManager::class)->getAutoSaveEntity($template)->entity;
++      if ($pending instanceof ContentTemplate) {
++        $template = $pending;
++      }
++    }
++    return self::forExposedSlot($template, $field);
++  }
++
++  /**
++   * Gets the restriction of one exposed slot on a particular template.
++   */
++  public static function forExposedSlot(ContentTemplate $template, string $field): array {
++    $definition = $template->getExposedSlots()[$field] ?? NULL;
++    if (!$definition) {
++      return [];
++    }
++    $parent = $template->getComponentTree()->getComponentTreeItemByUuid($definition['component_uuid']);
++    return $parent ? self::expected($parent->getValue(), $definition['slot_name']) : [];
++  }
++
++  /**
++   * Returns violations keyed by row delta, including exposed-field roots.
++   */
++  public static function violations(array $rows, array $root_expected = []): array {
++    $by_uuid = [];
++    foreach ($rows as $row) {
++      if (isset($row['uuid'])) {
++        $by_uuid[$row['uuid']] = $row;
++      }
++    }
++    $violations = [];
++    foreach ($rows as $delta => $row) {
++      $parent_uuid = $row['parent_uuid'] ?? NULL;
++      if ($parent_uuid) {
++        $parent = $by_uuid[$parent_uuid] ?? NULL;
++        // Structural validation reports missing parents and slot names.
++        $expected = $parent ? self::expected($parent, $row['slot'] ?? '') : [];
++      }
++      else {
++        $expected = $root_expected;
++        // A sole marker represents an intentionally empty override.
++        if (count($rows) === 1 && ($row['component_id'] ?? '') === Marker::EMPTY_SLOT_COMPONENT_ID) {
++          continue;
++        }
++      }
++      if ($expected && !in_array($row['component_id'] ?? '', $expected, TRUE)) {
++        $violations[$delta] = sprintf('This slot accepts only: %s. The component %s cannot be added here.', implode(', ', $expected), $row['component_id'] ?? '');
++      }
++    }
++    return $violations;
++  }
++
++  /**
++   * Checks only slot restrictions, preserving other incomplete draft inputs.
++   */
++  public static function validateEntity(EntityInterface $entity, bool $draft = FALSE): void {
++    $trees = [];
++    if ($entity instanceof ComponentTreeEntityInterface) {
++      $trees['component_tree'] = [$entity->getComponentTree()->getValue() ?? [], []];
++    }
++    elseif ($entity instanceof FieldableEntityInterface) {
++      foreach ($entity->getFieldDefinitions() as $field => $definition) {
++        if ($definition->getType() === 'component_tree') {
++          $trees[$field] = [$entity->get($field)->getValue() ?? [], self::forField($entity, $field, $draft)];
++        }
++      }
++    }
++    $violations = new ConstraintViolationList();
++    foreach ($trees as $field => [$rows, $expected]) {
++      foreach (self::violations($rows, $expected) as $delta => $message) {
++        $violations->add(new ConstraintViolation($message, $message, [], $entity, "$field.$delta.component_id", $rows[$delta]['component_id']));
++      }
++    }
++    if (count($violations)) {
++      throw new ConstraintViolationException($violations);
++    }
++  }
++
++}
+diff --git a/ui/src/app/store.ts b/ui/src/app/store.ts
+--- a/ui/src/app/store.ts
++++ b/ui/src/app/store.ts
+@@ -1,4 +1,5 @@
+ import undoable from 'redux-undo';
++import { toast } from 'sonner';
+ import { v4 as uuidv4 } from 'uuid';
+ import { combineSlices, configureStore } from '@reduxjs/toolkit';
+ import { setupListeners } from '@reduxjs/toolkit/query';
+@@ -17,6 +18,7 @@
+   setTranslations,
+   setUpdatePreview,
+ } from '@/features/layout/layoutModelSlice';
++import { slotRestrictionViolations } from '@/features/layout/slotRestrictions';
+ import { notificationsSlice } from '@/features/notifications/notificationsSlice';
+ import {
+   pageDataOwnerReducer,
+@@ -35,6 +37,7 @@
+   pushUndo,
+   setLatestUndoRedoActionId,
+   uiSlice,
++  unsetUpdatingComponent,
+ } from '@/features/ui/uiSlice';
+ import { assetLibraryApi } from '@/services/assetLibrary';
+ import { brandKitApi } from '@/services/brandKit';
+@@ -246,6 +249,54 @@
+     return next(action);
+   };
+ 
++// Predict structural edits with the same root reducer used by the store.
++// Reject the whole action before history, model, or preview state is changed.
++const slotRestrictionGuard: Middleware<{}, RootState> =
++  (api) => (next) => (action) => {
++    const type = (action as UnknownAction).type;
++    const structuralActions = [
++      'layoutModel/insertNodes',
++      'layoutModel/moveNode',
++      'layoutModel/duplicateNode',
++      'layoutModel/sortNode',
++      'layoutModel/shiftNode',
++      'layoutModel/overrideSlotDefaultContent',
++      'layoutModel/revertSlotOverride',
++      '@@redux-undo/layoutModel_UNDO',
++      '@@redux-undo/layoutModel_REDO',
++    ];
++    if (structuralActions.includes(type)) {
++      const state = api.getState();
++      const candidate = rootReducer(state, action as UnknownAction);
++      const components =
++        componentAndLayoutApi.endpoints.getComponents.select()(state).data ??
++        {};
++      const before = slotRestrictionViolations(
++        state.layoutModel.present.layout,
++        components,
++      );
++      const after = slotRestrictionViolations(
++        candidate.layoutModel.present.layout,
++        components,
++      );
++      for (const [edge, message] of after) {
++        if (!before.has(edge)) {
++          api.dispatch(unsetUpdatingComponent());
++          toast.error(message, {
++            style: {
++              width: 'auto',
++              height: 'auto',
++              whiteSpace: 'normal',
++              padding: '12px',
++            },
++          });
++          return false;
++        }
++      }
++    }
++    return next(action);
++  };
++
+ // The store setup is wrapped in `makeStore` to allow reuse
+ // when setting up tests that need the same store config
+ export const makeStore = (preloadedState?: Partial<RootState>) => {
+@@ -255,6 +306,7 @@
+     // and other useful features of `rtk-query`.
+     middleware: (getDefaultMiddleware) => {
+       return getDefaultMiddleware().concat(
++        slotRestrictionGuard,
+         patternApi.middleware,
+         pageVariantsApi.middleware,
+         assetLibraryApi.middleware,
+diff --git a/ui/src/components/list/ComponentList.test.tsx b/ui/src/components/list/ComponentList.test.tsx
+--- a/ui/src/components/list/ComponentList.test.tsx
++++ b/ui/src/components/list/ComponentList.test.tsx
+@@ -3,6 +3,7 @@
+ 
+ import ComponentList from '@/components/list/ComponentList';
+ 
++import type { RegionNode } from '@/features/layout/layoutModelSlice';
+ import type { ComponentsList } from '@/types/Component';
+ 
+ const queryMocks = vi.hoisted(() => ({
+@@ -10,6 +11,31 @@
+   folders: vi.fn(),
+   frontends: vi.fn(),
+   headlessSettings: vi.fn(),
++  state: {
++    layoutModel: { present: { layout: [] as RegionNode[], exposedSlots: {} } },
++    ui: {
++      selection: { items: [] as string[] },
++      targetSlot: undefined as string | undefined,
++    },
++  },
++}));
++
++vi.mock('@/app/hooks', () => ({
++  useAppSelector: (selector: (state: typeof queryMocks.state) => unknown) =>
++    selector(queryMocks.state),
++}));
++
++vi.mock('@/features/layout/layoutModelSlice', () => ({
++  selectLayout: (state: typeof queryMocks.state) =>
++    state.layoutModel.present.layout,
++  selectExposedSlots: (state: typeof queryMocks.state) =>
++    state.layoutModel.present.exposedSlots,
++}));
++
++vi.mock('@/features/ui/uiSlice', () => ({
++  selectSelectedComponentUuid: (state: typeof queryMocks.state) =>
++    state.ui.selection.items[0],
++  selectTargetSlot: (state: typeof queryMocks.state) => state.ui.targetSlot,
+ }));
+ 
+ vi.mock('@/services/componentAndLayout', () => ({
+@@ -117,6 +143,10 @@
+ 
+ describe('ComponentList', () => {
+   beforeEach(() => {
++    queryMocks.state = {
++      layoutModel: { present: { layout: [], exposedSlots: {} } },
++      ui: { selection: { items: [] }, targetSlot: undefined },
++    };
+     queryMocks.components.mockReturnValue({
+       data: components,
+       error: undefined,
+@@ -232,4 +262,81 @@
+     expect(screen.getByText('Block component')).toBeInTheDocument();
+     expect(screen.getByText('Extension component')).toBeInTheDocument();
+   });
++  const prepareRestrictedSlot = () => {
++    const catalogue = {
++      'js.tabs': {
++        ...components.react,
++        id: 'js.tabs',
++        name: 'Tabs',
++        metadata: { slots: { items: { expected: ['js.tab-item'] } } },
++      },
++      'js.tab-item': {
++        ...components.react,
++        id: 'js.tab-item',
++        name: 'Tab Item',
++      },
++      'js.text': { ...components.react, id: 'js.text', name: 'Text' },
++    };
++    queryMocks.components.mockReturnValue({
++      data: catalogue,
++      isLoading: false,
++    });
++    queryMocks.state.layoutModel.present.layout = [
++      {
++        id: 'content',
++        name: 'Content',
++        nodeType: 'region',
++        components: [
++          {
++            uuid: 'tabs',
++            type: 'js.tabs@1',
++            nodeType: 'component',
++            slots: [
++              {
++                id: 'tabs/items',
++                name: 'items',
++                nodeType: 'slot',
++                expected: ['js.tab-item'],
++                components: [],
++              },
++            ],
++          },
++        ],
++      },
++    ] as RegionNode[];
++    queryMocks.state.ui.selection.items = ['tabs'];
++  };
++
++  it('keeps a forbidden drag source mounted when the pointer enters and leaves a restricted slot', () => {
++    prepareRestrictedSlot();
++    const { rerender } = render(
++      <ComponentList searchTerm="" visibility="all" />,
++    );
++    const text = screen.getByText('Text');
++    for (const target of ['tabs/items', undefined, 'tabs/items', undefined]) {
++      queryMocks.state.ui.targetSlot = target;
++      rerender(<ComponentList searchTerm="" visibility="all" />);
++      expect(screen.getByText('Text')).toBe(text);
++    }
++  });
++
++  it('keeps an allowed drag source mounted over a restricted slot', () => {
++    prepareRestrictedSlot();
++    const { rerender } = render(
++      <ComponentList searchTerm="" visibility="all" />,
++    );
++    const item = screen.getByText('Tab Item');
++    queryMocks.state.ui.targetSlot = 'tabs/items';
++    rerender(<ComponentList searchTerm="" visibility="all" />);
++    expect(screen.getByText('Tab Item')).toBe(item);
++  });
++
++  it('filters the library when a restricted slot is selected', () => {
++    prepareRestrictedSlot();
++    queryMocks.state.ui.selection.items = ['tabs/items'];
++    render(<ComponentList searchTerm="" visibility="all" />);
++    expect(screen.getByText('Tab Item')).toBeInTheDocument();
++    expect(screen.queryByText('Text')).not.toBeInTheDocument();
++    expect(screen.queryByText('Tabs')).not.toBeInTheDocument();
++  });
+ });
+diff --git a/ui/src/components/list/ComponentList.tsx b/ui/src/components/list/ComponentList.tsx
+--- a/ui/src/components/list/ComponentList.tsx
++++ b/ui/src/components/list/ComponentList.tsx
+@@ -2,8 +2,15 @@
+ import { useErrorBoundary } from 'react-error-boundary';
+ import { skipToken } from '@reduxjs/toolkit/query';
+ 
++import { useAppSelector } from '@/app/hooks';
+ import ListItem from '@/components/list/ListItem';
++import {
++  selectExposedSlots,
++  selectLayout,
++} from '@/features/layout/layoutModelSlice';
++import { targetSlotExpected } from '@/features/layout/slotRestrictions';
+ import { LayoutItemType } from '@/features/ui/primaryPanelSlice';
++import { selectSelectedComponentUuid } from '@/features/ui/uiSlice';
+ import { useCanvasHeadlessSettings } from '@/hooks/useCanvasHeadlessSettings';
+ import {
+   useGetComponentsQuery,
+@@ -35,6 +42,9 @@
+ 
+ const ComponentList = ({ searchTerm, visibility }: ComponentListProps) => {
+   const headlessSettings = useCanvasHeadlessSettings();
++  const layout = useAppSelector(selectLayout);
++  const exposedSlots = useAppSelector(selectExposedSlots);
++  const selected = useAppSelector(selectSelectedComponentUuid);
+   const { data: allComponents, error, isLoading } = useGetComponentsQuery();
+   const {
+     data: configuredFrontends,
+@@ -102,6 +112,25 @@
+     );
+   }, [activeFrontendComponentIds, components, visibility]);
+ 
++  // Hover targets change throughout a drag. Filtering on them can unmount
++  // the active draggable and repeatedly reset dnd-kit's collision target.
++  // Selection changes only after insertion or an explicit selection action.
++  const expected = useMemo(
++    () => targetSlotExpected(layout, selected, allComponents, exposedSlots),
++    [layout, selected, allComponents, exposedSlots],
++  );
++  const slotComponents = useMemo(
++    () =>
++      expected.length
++        ? Object.fromEntries(
++            Object.entries(visibleComponents ?? {}).filter(([id]) =>
++              expected.includes(id),
++            ),
++          )
++        : visibleComponents,
++    [expected, visibleComponents],
++  );
++
+   useEffect(() => {
+     if (error || foldersError || frontendsError) {
+       showBoundary(error || foldersError || frontendsError);
+@@ -114,7 +143,7 @@
+ 
+   return (
+     <LibraryItemList<CanvasComponent>
+-      items={visibleComponents as ComponentsList}
++      items={slotComponents as ComponentsList}
+       folders={folders as FolderData}
+       isLoading={isLoading || foldersLoading || frontendsLoading}
+       searchTerm={searchTerm}
+diff --git a/ui/src/features/layout/exposedSlots.test.jsx b/ui/src/features/layout/exposedSlots.test.jsx
+--- a/ui/src/features/layout/exposedSlots.test.jsx
++++ b/ui/src/features/layout/exposedSlots.test.jsx
+@@ -24,6 +24,7 @@
+   deleteNode,
+   duplicateNode,
+   insertNodes,
++  moveNode,
+   overrideSlotDefaultContent,
+   removeExposedSlot,
+   revertSlotOverride,
+@@ -39,6 +40,11 @@
+   deriveSlotFieldName,
+   validateSlotFieldName,
+ } from '@/features/validation/validation';
++
++import {
++  slotRestrictionViolations,
++  targetSlotExpected,
++} from './slotRestrictions';
+ 
+ // The expose/detach *dialog* UI coverage (the single "Slot field" Select that
+ // defaults to reusing an existing field, the "Add new slot…" create path, and
+@@ -408,7 +414,7 @@
+   it('names the hosted slot and deletes component + slot on confirm', async () => {
+     expect(
+       await screen.findByText(/hosts editable slot “Hero”/),
+-    ).toBeInTheDocument();
++    ).not.toBeNull();
+     await userEvent.click(
+       await screen.findByRole('button', { name: 'Delete' }),
+     );
+@@ -717,3 +723,144 @@
+     });
+   });
+ });
++
++describe('slot component restrictions', () => {
++  const tabItem = {
++    nodeType: 'component',
++    uuid: 'tab-item-original',
++    type: 'js.tab-item@1',
++    slots: [],
++  };
++  const text = {
++    nodeType: 'component',
++    uuid: 'text-original',
++    type: 'js.text@1',
++    slots: [],
++  };
++  const tabs = (children = []) => ({
++    nodeType: 'component',
++    uuid: 'tabs-original',
++    type: 'js.tabs@1',
++    slots: [
++      {
++        nodeType: 'slot',
++        id: 'tabs-original/items',
++        name: 'items',
++        expected: ['js.tab-item'],
++        components: children,
++      },
++    ],
++  });
++  const initialize = (components, expected) => {
++    const store = makeStore();
++    store.dispatch(
++      setInitialLayoutModel({
++        layout: [
++          {
++            nodeType: 'region',
++            id: 'content',
++            name: 'Content',
++            expected,
++            components,
++          },
++        ],
++        model: {},
++      }),
++    );
++    return store;
++  };
++  const insert = (store, nodes, to) =>
++    store.dispatch(
++      insertNodes({
++        to,
++        layoutModel: { layout: nodes, model: {} },
++      }),
++    );
++
++  it('accepts Tab Item and atomically rejects text in a regular slot', () => {
++    const store = initialize([tabs()]);
++    insert(store, [tabItem], [0, 0, 0, 0]);
++    const before = store.getState().layoutModel;
++    expect(
++      before.present.layout[0].components[0].slots[0].components,
++    ).toHaveLength(1);
++    expect(insert(store, [text], [0, 0, 0, 1])).toBe(false);
++    expect(store.getState().layoutModel).toEqual(before);
++  });
++
++  it('rejects a mixed pattern as one operation, including nested bad children', () => {
++    const store = initialize([]);
++    const before = store.getState().layoutModel;
++    expect(insert(store, [tabs([text])], [0, 0])).toBe(false);
++    expect(store.getState().layoutModel).toEqual(before);
++  });
++
++  it('enforces exposed-region roots and allows an empty override marker', () => {
++    const store = initialize([], ['js.tab-item']);
++    expect(insert(store, [text], [0, 0])).toBe(false);
++    insert(store, [tabItem], [0, 0]);
++    expect(
++      store.getState().layoutModel.present.layout[0].components,
++    ).toHaveLength(1);
++    const empty = initialize([], ['js.tab-item']);
++    insert(empty, [{ ...text, type: 'marker.empty_slot@1' }], [0, 0]);
++    expect(
++      empty.getState().layoutModel.present.layout[0].components,
++    ).toHaveLength(1);
++  });
++
++  it('allows deleting invalid legacy content', () => {
++    const store = initialize([tabs([text])]);
++    store.dispatch(deleteNode('text-original'));
++    expect(
++      store.getState().layoutModel.present.layout[0].components[0].slots[0]
++        .components,
++    ).toEqual([]);
++  });
++
++  it('blocks moving an existing text component into Tabs', () => {
++    const store = initialize([tabs(), text]);
++    const before = store.getState().layoutModel;
++    expect(
++      store.dispatch(
++        moveNode({
++          uuid: 'text-original',
++          to: [0, 0, 0, 0],
++        }),
++      ),
++    ).toBe(false);
++    expect(store.getState().layoutModel).toEqual(before);
++  });
++  it('uses the active policy for old pattern metadata and contextual filtering', () => {
++    const legacy = tabs([text]);
++    legacy.slots[0].expected = [];
++    const store = initialize([legacy]);
++    const layout = store.getState().layoutModel.present.layout;
++    const catalogue = {
++      'js.tabs': {
++        metadata: { slots: { items: { expected: ['js.tab-item'] } } },
++      },
++    };
++    expect(slotRestrictionViolations(layout, catalogue).size).toBe(1);
++    expect(
++      targetSlotExpected(layout, 'tabs-original/items', catalogue),
++    ).toEqual(['js.tab-item']);
++    expect(targetSlotExpected(layout, 'text-original', catalogue)).toEqual([
++      'js.tab-item',
++    ]);
++  });
++  it('filters a selected exposed slot by its template marker identity', () => {
++    const store = initialize([], ['js.tab-item']);
++    const layout = store.getState().layoutModel.present.layout;
++    expect(
++      targetSlotExpected(
++        layout,
++        'template-tabs/items',
++        {},
++        {
++          content: { componentUuid: 'template-tabs', slotName: 'items' },
++        },
++      ),
++    ).toEqual(['js.tab-item']);
++  });
++});
+diff --git a/ui/src/features/layout/layoutModelSlice.ts b/ui/src/features/layout/layoutModelSlice.ts
+--- a/ui/src/features/layout/layoutModelSlice.ts
++++ b/ui/src/features/layout/layoutModelSlice.ts
+@@ -45,6 +45,7 @@
+ }
+ 
+ export interface RegionNode {
++  expected?: string[];
+   name: string;
+   id: string;
+   nodeType: NodeType.Region;
+@@ -59,6 +60,7 @@
+ }
+ 
+ export interface SlotNode {
++  expected?: string[];
+   nodeType: NodeType.Slot;
+   id: string;
+   name: string;
+@@ -968,6 +970,8 @@
+       Object.keys(component.metadata.slots).forEach((name) => {
+         slots.push({
+           id: `${uuid}/${name}`,
++          expected: (component.metadata.slots[name] as { expected?: string[] })
++            .expected,
+           name: name,
+           nodeType: NodeType.Slot,
+           components: [],
+@@ -991,13 +995,15 @@
+       },
+     };
+ 
+-    dispatch(
++    const inserted = dispatch(
+       insertNodes({
+         to,
+         layoutModel,
+         useUUID: uuid,
+       }),
+     );
++
++    if (!inserted) return;
+ 
+     // Get the new state immediately after the insertNode action was called so that setSelectedComponent will find
+     // the newly added component.
+@@ -1217,13 +1223,15 @@
+       return;
+     }
+ 
+-    dispatch(
++    const inserted = dispatch(
+       insertNodes({
+         to,
+         layoutModel,
+         useUUID: uuid,
+       }),
+     );
++
++    if (!inserted) return;
+ 
+     // Get the new state immediately after the insertNodes action was called so that setSelectedComponent will find
+     // the newly added component.
+diff --git a/ui/src/features/layout/slotRestrictions.ts b/ui/src/features/layout/slotRestrictions.ts
+new file mode 100644
+--- /dev/null
++++ b/ui/src/features/layout/slotRestrictions.ts
+@@ -0,0 +1,79 @@
++import type { ComponentsList } from '@/types/Component';
++import type { ComponentNode, RegionNode, SlotNode } from './layoutModelSlice';
++
++type SlotContainer = RegionNode | SlotNode;
++
++function expectedFor(
++  container: SlotContainer,
++  parent: ComponentNode | undefined,
++  components: ComponentsList,
++): string[] {
++  const definition = parent
++    ? components[parent.type.split('@')[0]]?.metadata?.slots?.[
++        (container as SlotNode).name
++      ]
++    : undefined;
++  return definition ? (definition.expected ?? []) : (container.expected ?? []);
++}
++
++/** Collect invalid edges so existing invalid content can still be repaired. */
++export function slotRestrictionViolations(
++  layout: RegionNode[],
++  components: ComponentsList = {},
++): Map<string, string> {
++  const violations = new Map<string, string>();
++  function visit(container: SlotContainer, parent?: ComponentNode) {
++    const expected = expectedFor(container, parent, components);
++    for (const child of container.components) {
++      const type = child.type.split('@')[0];
++      const emptyOverride =
++        container.nodeType === 'region' &&
++        container.components.length === 1 &&
++        type === 'marker.empty_slot';
++      if (expected.length && !expected.includes(type) && !emptyOverride) {
++        violations.set(
++          `${container.id}/${child.uuid}/${type}`,
++          `This slot accepts only: ${expected.join(', ')}.`,
++        );
++      }
++      for (const slot of child.slots) {
++        visit(slot, child);
++      }
++    }
++  }
++  layout.forEach((region) => visit(region));
++  return violations;
++}
++
++/** Resolve a selected slot, exposed region, or a selected child's container. */
++export function targetSlotExpected(
++  layout: RegionNode[],
++  target: string | undefined,
++  components: ComponentsList = {},
++  exposedSlots: Record<
++    string,
++    { componentUuid: string; slotName: string }
++  > = {},
++): string[] {
++  if (!target) return [];
++  const alias = Object.entries(exposedSlots).find(
++    ([field, slot]) =>
++      `${slot.componentUuid}/${slot.slotName}` === target &&
++      layout.some((region) => region.id === field),
++  )?.[0];
++  target = alias ?? target;
++  let result: string[] = [];
++  function visit(container: SlotContainer, parent?: ComponentNode) {
++    if (
++      container.id === target ||
++      container.components.some((child) => child.uuid === target)
++    ) {
++      result = expectedFor(container, parent, components);
++    }
++    for (const child of container.components) {
++      child.slots.forEach((slot) => visit(slot, child));
++    }
++  }
++  layout.forEach((region) => visit(region));
++  return result;
++}
+diff --git a/ui/src/hooks/useCopyPasteComponents.ts b/ui/src/hooks/useCopyPasteComponents.ts
+--- a/ui/src/hooks/useCopyPasteComponents.ts
++++ b/ui/src/hooks/useCopyPasteComponents.ts
+@@ -78,14 +78,14 @@
+     to[to.length - 1]++;
+ 
+     const assignedUUID = uuidv4();
+-    dispatch(
++    const inserted = dispatch(
+       insertNodes({
+         to: to,
+         layoutModel: componentFromClipboard,
+         useUUID: assignedUUID,
+       }),
+     );
+-    setSelectedComponent(assignedUUID);
++    if (inserted) setSelectedComponent(assignedUUID);
+   };
+ 
+   return { pasteAfterSelectedComponent, copySelectedComponent };
+diff --git a/ui/src/hooks/useDropFromLayoutHandler.ts b/ui/src/hooks/useDropFromLayoutHandler.ts
+--- a/ui/src/hooks/useDropFromLayoutHandler.ts
++++ b/ui/src/hooks/useDropFromLayoutHandler.ts
+@@ -55,8 +55,8 @@
+     // if we got this far, then we have a valid location to move the dragged component to!
+     // @todo We should optimistically move the elementsInsideIframe to the new location in the iFrames dom.
+     // for now, we pass true here which will put the elementsInsideIframe into a 'pending move' state.
+-    afterDrag(elementsInsideIframe, true, activeUuid);
+-    dispatch(moveNode({ uuid: activeUuid, to: dropPath }));
++    const moved = dispatch(moveNode({ uuid: activeUuid, to: dropPath }));
++    afterDrag(elementsInsideIframe, Boolean(moved), activeUuid);
+   }
+ 
+   return { handleExistingDrop };
+
