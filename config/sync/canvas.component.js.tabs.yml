@@ -4,9 +4,43 @@ status: true
 dependencies:
   config:
     - canvas.js_component.tabs
-active_version: f5cb6817dc08ac97
+active_version: 372eda8c0d5dc5e7
 versioned_properties:
   active:
+    settings:
+      prop_field_definitions:
+        header:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Explore the options'
+          expression: ℹ︎string␟value
+          derived_schema_metadata:
+            string_shape: {  }
+        subheader:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Choose a tab to see more.'
+          expression: ℹ︎string␟value
+          derived_schema_metadata:
+            string_shape: {  }
+    fallback_metadata:
+      slot_definitions:
+        items:
+          title: Tabs
+          description: 'Add a Tab Item for each tab, in the order you want it to appear.'
+          expected:
+            - js.tab-item
+  f5cb6817dc08ac97:
     settings:
       prop_field_definitions:
         header:

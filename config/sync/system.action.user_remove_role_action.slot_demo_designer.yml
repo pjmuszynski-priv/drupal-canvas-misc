@@ -1,0 +1,14 @@
+uuid: 9e93e06a-6b08-48ab-a0b0-5853acd5dbb9
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.slot_demo_designer
+  module:
+    - user
+id: user_remove_role_action.slot_demo_designer
+label: 'Remove the Slot demo: template designer role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: slot_demo_designer

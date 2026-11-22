@@ -21,8 +21,10 @@ frontends:
       - js.logo_card
       - js.section
       - js.spacer
+      - js.tab-item
+      - js.tabs
+      - js.template_shell
       - js.text
       - js.two_column_text
       - js.video
-      - js.template_shell
 assertion_expiration: 60

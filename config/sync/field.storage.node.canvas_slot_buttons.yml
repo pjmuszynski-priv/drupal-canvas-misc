@@ -1,0 +1,19 @@
+uuid: 4d9471ab-a3db-4381-bd64-7acd638528ed
+langcode: en
+status: true
+dependencies:
+  module:
+    - canvas
+    - node
+id: node.canvas_slot_buttons
+field_name: canvas_slot_buttons
+entity_type: node
+type: component_tree
+settings: {  }
+module: canvas
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

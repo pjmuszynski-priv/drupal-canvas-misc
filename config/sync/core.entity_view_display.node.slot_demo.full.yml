@@ -5,6 +5,7 @@ dependencies:
   config:
     - core.entity_view_mode.node.full
     - field.field.node.slot_demo.canvas_slot_additional
+    - field.field.node.slot_demo.canvas_slot_buttons
     - field.field.node.slot_demo.canvas_slot_main
     - node.type.slot_demo
   module:
@@ -21,4 +22,5 @@ content:
     region: content
 hidden:
   canvas_slot_additional: true
+  canvas_slot_buttons: true
   canvas_slot_main: true

@@ -1,0 +1,14 @@
+uuid: c0257e5e-1f33-4282-91d4-71f20a93702b
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.slot_demo_editor
+  module:
+    - user
+id: user_remove_role_action.slot_demo_editor
+label: 'Remove the Slot demo: moderator role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: slot_demo_editor

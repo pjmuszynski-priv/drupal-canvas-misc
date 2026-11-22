@@ -4,6 +4,7 @@ status: true
 dependencies: {  }
 machineName: tab-item
 name: 'Tab Item'
+type: external
 required:
   - tabLabel
 props:

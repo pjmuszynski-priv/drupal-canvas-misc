@@ -1,0 +1,14 @@
+uuid: 50c1a81b-f844-475c-8096-57875ae7174b
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.slot_demo_designer
+  module:
+    - user
+id: user_add_role_action.slot_demo_designer
+label: 'Add the Slot demo: template designer role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: slot_demo_designer

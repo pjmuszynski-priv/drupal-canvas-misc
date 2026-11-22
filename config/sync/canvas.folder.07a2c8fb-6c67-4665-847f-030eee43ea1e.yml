@@ -4,9 +4,7 @@ status: true
 dependencies:
   config:
     - canvas.component.js.a
-    - canvas.component.js.accordion
     - canvas.component.js.blockquote
-    - canvas.component.js.card
     - canvas.component.js.card_container
     - canvas.component.js.container
     - canvas.component.js.footer
@@ -18,9 +16,13 @@ dependencies:
     - canvas.component.js.logo_card
     - canvas.component.js.section
     - canvas.component.js.spacer
+    - canvas.component.js.tab-item
+    - canvas.component.js.tabs
+    - canvas.component.js.template_shell
     - canvas.component.js.text
     - canvas.component.js.two_column_text
     - canvas.component.js.video
+    - canvas.component.marker.empty_slot
     - canvas.component.marker.page_content
     - canvas.component.sdc.navigation.message
     - canvas.component.sdc.navigation.title
@@ -30,9 +32,7 @@ configEntityTypeId: component
 weight: 0
 items:
   - js.a
-  - js.accordion
   - js.blockquote
-  - js.card
   - js.card_container
   - js.container
   - js.footer
@@ -44,9 +44,13 @@ items:
   - js.logo_card
   - js.section
   - js.spacer
+  - js.tab-item
+  - js.tabs
+  - js.template_shell
   - js.text
   - js.two_column_text
   - js.video
+  - marker.empty_slot
   - marker.page_content
   - sdc.navigation.message
   - sdc.navigation.title

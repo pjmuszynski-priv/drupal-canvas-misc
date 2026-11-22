@@ -1,0 +1,30 @@
+uuid: a246d847-709c-4dec-9e31-70af3ab7b6af
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - node.type.slot_demo
+id: node.slot_demo.full
+targetEntityType: node
+bundle: slot_demo
+mode: full
+useLayoutBuilder: false
+forceAutoProcessing: false
+customElementName: canvas-node-slot_demo-full
+content:
+  created:
+    formatter: auto
+    field_name: created
+    is_slot: false
+    weight: 0
+  title:
+    formatter: auto
+    field_name: title
+    is_slot: false
+    weight: -5
+  uid:
+    formatter: auto
+    field_name: uid
+    is_slot: false
+    weight: 0

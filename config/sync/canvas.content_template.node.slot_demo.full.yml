@@ -3,17 +3,33 @@ langcode: en
 status: true
 dependencies:
   config:
+    - canvas.component.js.a
+    - canvas.component.js.accordion
+    - canvas.component.js.card
     - canvas.component.js.container
     - canvas.component.js.grid_container
     - canvas.component.js.heading
+    - canvas.component.js.image
     - canvas.component.js.section
+    - canvas.component.js.tab-item
+    - canvas.component.js.tabs
     - canvas.component.js.text
     - core.entity_view_mode.node.full
+    - field.field.media.image.field_media_image
     - field.field.node.slot_demo.canvas_slot_additional
     - field.field.node.slot_demo.canvas_slot_main
     - filter.format.canvas_html_block
+    - image.style.canvas_parametrized_width
+    - media.type.image
     - node.type.slot_demo
+  content:
+    - 'file:file:507fcfa8-b67d-477c-a4fc-87ef4e64c07b'
+    - 'media:image:aa015904-df7d-4d1a-89fd-84d9754ad81f'
   module:
+    - canvas_ai_disclosure
+    - file
+    - link
+    - media
     - node
     - options
     - text
@@ -22,13 +38,23 @@ content_entity_type_id: node
 content_entity_type_bundle: slot_demo
 content_entity_type_view_mode: full
 component_tree:
-  6750b4b3-b6f3-43ee-a9f0-c39890a34404:
+  '0:6750b4b3-b6f3-43ee-a9f0-c39890a34404':
     uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
     component_id: js.section
     component_version: 27b0cb8d893d96c8
     inputs:
       width: wide
-  6750b4b3-b6f3-43ee-a9f0-c39890a34407:
+  '0:content:0:6750b4b3-b6f3-43ee-a9f0-c39890a34408':
+    parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
+    slot: content
+    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34408
+    component_id: js.text
+    component_version: 39a4d4ce44c087d9
+    inputs:
+      text:
+        value: '<p>This introduction is shared by every page using this Canvas template.</p>'
+        format: canvas_html_block
+  '0:content:1:6750b4b3-b6f3-43ee-a9f0-c39890a34407':
     parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
     slot: content
     uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34407
@@ -38,7 +64,7 @@ component_tree:
       text:
         value: '<p><strong>Canvas template demo</strong> · <a href="/slot-demo/alpha">Alpha</a> · <a href="/slot-demo/beta">Beta</a></p>'
         format: canvas_html_block
-  6750b4b3-b6f3-43ee-a9f0-c39890a34403:
+  '0:content:2:6750b4b3-b6f3-43ee-a9f0-c39890a34403':
     parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
     slot: content
     uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34403
@@ -52,17 +78,16 @@ component_tree:
       headingElement: h1
       headingSize: large
       layout: left_aligned
-  6750b4b3-b6f3-43ee-a9f0-c39890a34408:
+  '0:content:3:55687378-79b1-444b-bd40-e7aed1c714b9':
     parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
     slot: content
-    uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34408
-    component_id: js.text
-    component_version: 39a4d4ce44c087d9
+    uuid: 55687378-79b1-444b-bd40-e7aed1c714b9
+    component_id: js.a
+    component_version: 94b21ae0d728b1e4
     inputs:
-      text:
-        value: '<p>This introduction is shared by every page using this Canvas template.</p>'
-        format: canvas_html_block
-  6750b4b3-b6f3-43ee-a9f0-c39890a34405:
+      borderColor: gray_200
+      variant: default
+  '0:content:4:6750b4b3-b6f3-43ee-a9f0-c39890a34405':
     parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
     slot: content
     uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34405
@@ -71,7 +96,103 @@ component_tree:
     inputs:
       layout: 67-33
       gap: large
-  6750b4b3-b6f3-43ee-a9f0-c39890a34401:
+  '0:content:4:content:0:4edd7375-4cde-4fa2-adff-4f3f3edaf5c1':
+    parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34405
+    slot: content
+    uuid: 4edd7375-4cde-4fa2-adff-4f3f3edaf5c1
+    component_id: js.accordion
+    component_version: 94b21ae0d728b1e4
+    inputs:
+      borderColor: gray_200
+      variant: default
+  '0:content:4:content:0:items:0:88dc905a-72fd-4f78-8a71-9e868feb42ac':
+    parent_uuid: 4edd7375-4cde-4fa2-adff-4f3f3edaf5c1
+    slot: items
+    uuid: 88dc905a-72fd-4f78-8a71-9e868feb42ac
+    component_id: js.tabs
+    component_version: 372eda8c0d5dc5e7
+    inputs:
+      header: 'Explore the options'
+      subheader: 'Choose a tab to see more.'
+  '0:content:4:content:0:items:0:items:0:55f7e01d-c0da-49b4-b74c-db3c014b6871':
+    parent_uuid: 88dc905a-72fd-4f78-8a71-9e868feb42ac
+    slot: items
+    uuid: 55f7e01d-c0da-49b4-b74c-db3c014b6871
+    component_id: js.tab-item
+    component_version: 82affab12264632a
+    inputs:
+      tabLabel: Overview
+  '0:content:4:content:0:items:0:items:0:body:0:126429e8-ff08-4879-a003-f7be9d7fbdbe':
+    parent_uuid: 55f7e01d-c0da-49b4-b74c-db3c014b6871
+    slot: body
+    uuid: 126429e8-ff08-4879-a003-f7be9d7fbdbe
+    component_id: js.card
+    component_version: 0f63ef6dd37c1fd1
+    inputs:
+      variant: default
+      image:
+        target_id: '2'
+      layout: left_aligned
+      heading: 'Feature or benefit'
+      headingElement: h3
+      byline: 'Alice Williams'
+      text:
+        value: 'Help people become familiar with the organization and its offerings, creating a sense of connection and trust.'
+        format: canvas_html_block
+      link:
+        uri: 'internal:/'
+        options: {  }
+      linkVariant: link
+  '0:content:4:content:0:items:0:items:1:84de24a6-4e42-49e6-bdf4-3e2a2040cf6c':
+    parent_uuid: 88dc905a-72fd-4f78-8a71-9e868feb42ac
+    slot: items
+    uuid: 84de24a6-4e42-49e6-bdf4-3e2a2040cf6c
+    component_id: js.tab-item
+    component_version: 82affab12264632a
+    inputs:
+      tabLabel: Overview
+  '0:content:4:content:0:items:0:items:2:3912d807-0717-4dd4-ab03-b2d0f5869203':
+    parent_uuid: 88dc905a-72fd-4f78-8a71-9e868feb42ac
+    slot: items
+    uuid: 3912d807-0717-4dd4-ab03-b2d0f5869203
+    component_id: js.tab-item
+    component_version: 82affab12264632a
+    inputs:
+      tabLabel: Overview
+  '0:content:4:content:0:items:1:099ae328-77b3-4691-bb05-ea87b5d031ce':
+    parent_uuid: 4edd7375-4cde-4fa2-adff-4f3f3edaf5c1
+    slot: items
+    uuid: 099ae328-77b3-4691-bb05-ea87b5d031ce
+    component_id: js.image
+    component_version: 5e107220ef66ee34
+    inputs:
+      image:
+        sourceType: default-relative-url
+        value:
+          src: 'https://placehold.co/800x600@2x.png?alternateWidths=https%3A%2F%2Fplacehold.co%2F%7Bwidth%7Dx%7Bheight%7D%402x.png'
+          alt: 'Example image placeholder'
+          width: 800
+          height: 600
+        jsonSchema:
+          type: object
+          properties:
+            src:
+              type: string
+              contentMediaType: 'image/*'
+              format: uri-reference
+              x-allowed-schemes:
+                - http
+                - https
+            alt:
+              type: string
+            width:
+              type: integer
+            height:
+              type: integer
+          required:
+            - src
+        componentId: js.image
+  '0:content:4:content:1:6750b4b3-b6f3-43ee-a9f0-c39890a34401':
     parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34405
     slot: content
     uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34401
@@ -79,7 +200,7 @@ component_tree:
     component_version: c9b8703a0bf100a5
     inputs:
       columns: 1
-  6750b4b3-b6f3-43ee-a9f0-c39890a34402:
+  '0:content:4:content:2:6750b4b3-b6f3-43ee-a9f0-c39890a34402':
     parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34405
     slot: content
     uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34402
@@ -87,7 +208,7 @@ component_tree:
     component_version: c9b8703a0bf100a5
     inputs:
       columns: 1
-  6750b4b3-b6f3-43ee-a9f0-c39890a34406:
+  '0:content:5:6750b4b3-b6f3-43ee-a9f0-c39890a34406':
     parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
     slot: content
     uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34406
@@ -97,6 +218,51 @@ component_tree:
       text:
         value: '<p>Shared footer · edited in the Canvas content template.</p>'
         format: canvas_html_block
+  '0:content:6:5ca04064-9c93-4240-8026-3f17818c32ca':
+    parent_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34404
+    slot: content
+    uuid: 5ca04064-9c93-4240-8026-3f17818c32ca
+    component_id: js.card
+    component_version: 0f63ef6dd37c1fd1
+    inputs:
+      variant: default
+      image:
+        sourceType: default-relative-url
+        value:
+          src: 'https://placehold.co/800x600@2x.png?alternateWidths=https%3A%2F%2Fplacehold.co%2F%7Bwidth%7Dx%7Bheight%7D%402x.png'
+          alt: 'Example image placeholder'
+          width: 800
+          height: 600
+        jsonSchema:
+          type: object
+          properties:
+            src:
+              type: string
+              contentMediaType: 'image/*'
+              format: uri-reference
+              x-allowed-schemes:
+                - http
+                - https
+            alt:
+              type: string
+            width:
+              type: integer
+            height:
+              type: integer
+          required:
+            - src
+        componentId: js.card
+      layout: left_aligned
+      heading: 'Feature or benefit'
+      headingElement: h3
+      byline: 'Alice Williams'
+      text:
+        value: 'Help people become familiar with the organization and its offerings, creating a sense of connection and trust.'
+        format: canvas_html_block
+      link:
+        uri: 'internal:/'
+        options: {  }
+      linkVariant: link
 exposed_slots:
   canvas_slot_additional:
     component_uuid: 6750b4b3-b6f3-43ee-a9f0-c39890a34402

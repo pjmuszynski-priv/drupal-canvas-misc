@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.node.slot_demo.canvas_slot_additional
+    - field.field.node.slot_demo.canvas_slot_buttons
     - field.field.node.slot_demo.canvas_slot_main
     - node.type.slot_demo
   module:
@@ -52,6 +53,7 @@ content:
     third_party_settings: {  }
 hidden:
   canvas_slot_additional: true
+  canvas_slot_buttons: true
   canvas_slot_main: true
   promote: true
   sticky: true

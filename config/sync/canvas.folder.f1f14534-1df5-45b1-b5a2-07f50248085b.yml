@@ -10,6 +10,8 @@ dependencies:
     - canvas.component.block.system_menu_block.main
     - canvas.component.block.system_menu_block.navigation-user-links
     - canvas.component.block.system_menu_block.tools
+    - canvas.component.js.accordion
+    - canvas.component.js.card
 name: Menus
 configEntityTypeId: component
 weight: 0
@@ -21,3 +23,5 @@ items:
   - block.system_menu_block.main
   - block.system_menu_block.navigation-user-links
   - block.system_menu_block.tools
+  - js.accordion
+  - js.card

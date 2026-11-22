@@ -21,6 +21,8 @@ slots:
   items:
     title: Tabs
     description: 'Add a Tab Item for each tab, in the order you want it to appear.'
+    expected:
+      - js.tab-item
 js:
   original: |
     'use client';

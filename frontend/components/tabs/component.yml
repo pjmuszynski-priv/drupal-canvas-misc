@@ -17,4 +17,6 @@ props:
 slots:
   items:
     title: Tabs
+    expected:
+      - js.tab-item
     description: Add a Tab Item for each tab, in the order you want it to appear.

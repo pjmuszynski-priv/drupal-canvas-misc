@@ -1,0 +1,14 @@
+uuid: a09688cf-0833-478c-8202-a0853e40aca1
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.slot_demo_editor
+  module:
+    - user
+id: user_add_role_action.slot_demo_editor
+label: 'Add the Slot demo: moderator role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: slot_demo_editor
