@@ -1,0 +1,8 @@
+name: Canvas Media Translation
+type: module
+description: Adds image alt translations to the Media Directories quick-edit form used by Canvas.
+core_version_requirement: ^11
+package: Custom
+dependencies:
+  - drupal:content_translation
+  - media_directories:media_directories_canvas
